@@ -5,17 +5,22 @@ ini_set("display_error", 1);
 $message = '';
 
 if(isset($_POST['add_to_cart']))
-{if(isset($_COOKIE['shoppingcart']))
+{
+    if(isset($_COOKIE['shopping_cart']))
     {
-        $cookie_data = $_COOKIE['shoppingcart'];
+        $cookie_data = $_COOKIE['shopping_cart'];
+
         $cart_data = json_decode($cookie_data, true);
     } else {
+
         $cart_data = array();
     }
+
     $item_list = array_column($cart_data, 'hidden_id');
-    if(in_array($_POST["hidden_id"], $itemlist))
+
+    if(in_array($_POST["hidden_id"], $item_list))
     {
-    foreach($cart_data as $k => $v)
+        foreach($cart_data as $k => $v)
         {
             if($cart_data[$k]["hidden_id"] == $_POST["hidden_id"])
             {
@@ -35,34 +40,35 @@ if(isset($_POST['add_to_cart']))
 } 
 
     $item_data = json_encode($cart_data);
-    setcookie('shoppingcart', $item_data, time() + (62300 * 50));
+    setcookie('shopping_cart', $item_data, time() + (86400 * 30));
     header("location:index.php?success=1");
 }
 
 if(isset($_GET["action"]) == "clear")
 {
-   setcookie("shoppingcart","", time() -3600);
+   setcookie("shopping_cart","", time() -3600);
    header("location:index.php?clearAll=1");
 }
+// [element2]
 if(isset($_GET["action"]) == "delete")
 {
-    $cookie_data = stripslashes($_COOKIE['shoppingcart']);
+    $cookie_data = stripslashes($_COOKIE['shopping_cart']);
     $cart_data = json_decode($cookie_data, true);
     foreach($cart_data as $k => $v) {
         if($cart_data[$k]["hidden_id"] == $_GET['id']) {
             unset($cart_data[$k]);
             $item_data = json_encode($cart_data);
-            setcookie('shoppingcart', $item_data, time() + (62300 * 50));
+            setcookie('shopping_cart', $item_data, time() + (86400 *30));
             header("location:index.php?remove=1");
         }
     }
 }
 
-if(isset($_GET['success']))
+if(isset($_GET['succes']))
 {
     $message = '
     <div>
-        The product has been added
+        le produit a ete ajouter avec succes
     </div>
     ';
 }
@@ -71,20 +77,21 @@ if(isset($_GET['remove']))
 {
     $message = '
     <div>
-        The product has been removed
+        le produit a ete enlever avec succes
     </div>
     ';
 }
 
-if(isset($_GET['clearall']))
+if(isset($_GET['clearAll']))
 {
     $message = '
     <div>
-        Shopping cart has been emptied
+        le panier a ete vider
     </div>
     ';
 }
 ?>
+
 
 
 
@@ -110,6 +117,13 @@ max-width: 200px;
     <div class="title">    
         <h2>Fake Nike</h2>
     </div>
+    <?php
+        if(isset($_COOKIE['shopping_cart']))
+        {
+        //    print_r($_COOKIE['shopping_cart']);
+        }
+            echo $message;
+        ?>
     <div class="form">
         <form method="post">
              <div class="product">
@@ -154,13 +168,7 @@ max-width: 200px;
             </div>
         </form>
     </div>
-    <?php
-        if(isset($_COOKIE['shoppingcart']))
-        {
-           print_r($_COOKIE['shoppingcart']);
-        }
-            echo $message;
-        ?>
+
 
 <div style="clear:both">
    <p>Shopping cart</p>
@@ -173,9 +181,9 @@ max-width: 200px;
             <td>Action</td>
         </tr>
      <?php
-        if(isset($_COOKIE['shoppingcart'])) {
+        if(isset($_COOKIE['shopping_cart'])) {
             $total = 0;
-            $cookie_data = stripslashes($_COOKIE['shoppingcart']);
+            $cookie_data = stripslashes($_COOKIE['shopping_cart']);
             $cart_data = json_decode($cookie_data, true);
             foreach($cart_data as $k => $v)
             {
